@@ -35,12 +35,22 @@ static bin_image b_image = {
  .magic             = 0xe9,
  .num_segments      = 0,
  .flash_mode        = FLASH_MODE_QIO,
- .flash_size_freq   = FLASH_SIZE_512K | FLASH_FREQ_40
+ .flash_size_freq   = FLASH_SIZE_8m | FLASH_FREQ_40
 };
 
 static unsigned int total_size = 0;
 static binimage_header_layout_t header_layout = HL_ESP8266;
 
+
+bin_image *get_image_param(void)
+{
+    return &b_image;
+}
+
+unsigned char get_flash_mode(void)
+{
+    return b_image.flash_mode;
+}
 
 int binimage_add_segment(uint32_t address, uint32_t size, unsigned char *data)
 {
@@ -126,7 +136,7 @@ int binimage_write(uint32_t padsize, bool close)
 {
     unsigned int cnt, cnt2;
     unsigned char chksum;
-    
+
     chksum = 0xEF;
     
     if(b_image.image_file == 0)
@@ -329,7 +339,7 @@ int binimage_set_flash_freq(const char* freqstr)
 }
 
 static const char* flash_mode_str[] = {"qio", "qout", "dio", "dout"};
-static const char* flash_size_str[] = {"512K", "256K", "1M", "2M", "4M", "8M", "16M", "32M"};
+static const char* flash_size_str[] = {"4m", "2m", "8m", "16m", "32m", "16m-c1", "32m-c1", "32m-c2"};
 
 unsigned char binimage_parse_flash_mode(const char* str)
 {
@@ -380,7 +390,7 @@ const char* binimage_flash_mode_to_str(unsigned char mode)
 
 const char* binimage_flash_size_to_str(unsigned char size)
 {
-    if ((size >> 4) > FLASH_SIZE_32M)
+    if ((size >> 4) > FLASH_SIZE_32m_c2)
         return "";
     return flash_size_str[size >> 4];
 }

@@ -38,6 +38,8 @@
 #include "espcomm_boards.h"
 #include "delay.h"
 
+#include "esptool_binimage.h"
+
 const int progress_line_width = 80;
 
 bootloader_packet send_packet;
@@ -515,6 +517,8 @@ bool espcomm_upload_mem_to_RAM(uint8_t* src, size_t size, int address, int entry
 
 bool espcomm_upload_file(const char *name)
 {
+    bin_image *bin_image_settings;
+    
     LOGDEBUG("espcomm_upload_file");
     struct stat st;
     if(stat(name, &st) != 0)
@@ -546,6 +550,13 @@ bool espcomm_upload_file(const char *name)
         LOGERR("failed to read file contents");
         free(file_contents);
         return false;
+    }
+    
+    if(file_contents[0] == 0xe9 && espcomm_address == 0x00000000)
+    {
+        bin_image_settings = get_image_param();
+        file_contents[2] = bin_image_settings->flash_mode;
+        file_contents[3] = bin_image_settings->flash_size_freq;
     }
 
     if (!espcomm_upload_mem(file_contents, st.st_size, name))

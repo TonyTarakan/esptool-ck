@@ -70,14 +70,14 @@ typedef struct {
 #define FLASH_MODE_DIO  2
 #define FLASH_MODE_DOUT 3
 
-#define FLASH_SIZE_512K 0 << 4
-#define FLASH_SIZE_256K 1 << 4
-#define FLASH_SIZE_1M   2 << 4
-#define FLASH_SIZE_2M   3 << 4
-#define FLASH_SIZE_4M   4 << 4
-#define FLASH_SIZE_8M   5 << 4
-#define FLASH_SIZE_16M  6 << 4
-#define FLASH_SIZE_32M  7 << 4
+#define FLASH_SIZE_4m       0 << 4
+#define FLASH_SIZE_2m       1 << 4
+#define FLASH_SIZE_8m       1 << 4
+#define FLASH_SIZE_16m      2 << 4
+#define FLASH_SIZE_32m      3 << 4
+#define FLASH_SIZE_16m_c1   4 << 4
+#define FLASH_SIZE_32m_c1   5 << 4
+#define FLASH_SIZE_32m_c2   6 << 4
 
 // flash frequency in MHz
 #define FLASH_FREQ_40   0x0
@@ -137,5 +137,8 @@ int binimage_set_flash_mode(const char* mode);
 int binimage_set_flash_size(const char* size);
 int binimage_set_flash_freq(const char* freq);
 int binimage_set_header_layout(const char* layout);
+
+bin_image *get_image_param(void);
+unsigned char get_flash_mode(void);
 
 #endif
