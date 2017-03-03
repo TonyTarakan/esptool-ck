@@ -72,12 +72,12 @@ typedef struct {
 
 #define FLASH_SIZE_4m       0 << 4
 #define FLASH_SIZE_2m       1 << 4
-#define FLASH_SIZE_8m       1 << 4
-#define FLASH_SIZE_16m      2 << 4
-#define FLASH_SIZE_32m      3 << 4
-#define FLASH_SIZE_16m_c1   4 << 4
-#define FLASH_SIZE_32m_c1   5 << 4
-#define FLASH_SIZE_32m_c2   6 << 4
+#define FLASH_SIZE_8m       2 << 4
+#define FLASH_SIZE_16m      3 << 4
+#define FLASH_SIZE_32m      4 << 4
+#define FLASH_SIZE_16m_c1   5 << 4
+#define FLASH_SIZE_32m_c1   6 << 4
+#define FLASH_SIZE_32m_c2   7 << 4
 
 // flash frequency in MHz
 #define FLASH_FREQ_40   0x0
