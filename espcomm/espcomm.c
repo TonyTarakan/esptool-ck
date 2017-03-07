@@ -517,7 +517,7 @@ bool espcomm_upload_mem_to_RAM(uint8_t* src, size_t size, int address, int entry
 
 bool espcomm_upload_file(const char *name)
 {
-    bin_image *bin_image_settings;
+    bin_image *bin_image_settings = get_image_param();
     
     LOGDEBUG("espcomm_upload_file");
     struct stat st;
@@ -552,11 +552,24 @@ bool espcomm_upload_file(const char *name)
         return false;
     }
     
-    if(file_contents[0] == 0xe9 && espcomm_address == 0x00000000)
+    if(s_chip == ESPCOMM_8266)
     {
-        bin_image_settings = get_image_param();
-        file_contents[2] = bin_image_settings->flash_mode;
-        file_contents[3] = bin_image_settings->flash_size_freq;
+        if(file_contents[0] == 0xe9 && espcomm_address == 0x00000000)
+        {
+            file_contents[2] = bin_image_settings->flash_mode;
+            file_contents[3] = bin_image_settings->flash_size_freq;
+        }
+        
+        //check address and offset (getting_started_guide.pdf by espressif)
+        if((espcomm_address == 0x0007E000 && (((bin_image_settings->flash_size_freq) & 0xF0) == FLASH_SIZE_4m)) || \
+        (espcomm_address == 0x000FC000 && (((bin_image_settings->flash_size_freq) & 0xF0) == FLASH_SIZE_8m)) || \
+        (espcomm_address == 0x001FC000 && ((((bin_image_settings->flash_size_freq) & 0xF0) == FLASH_SIZE_16m ||  ((bin_image_settings->flash_size_freq) & 0xF0) == FLASH_SIZE_16m_c1))) || \
+        (espcomm_address == 0x003FC000 && ((((bin_image_settings->flash_size_freq) & 0xF0) == FLASH_SIZE_32m ||  ((bin_image_settings->flash_size_freq) & 0xF0) == FLASH_SIZE_32m_c1))) \
+        )
+        {
+            //0x30 - offset of quartz freq in init_data_default.bin
+            file_contents[0x30] = bin_image_settings->quartz_freq;
+        }
     }
 
     if (!espcomm_upload_mem(file_contents, st.st_size, name))

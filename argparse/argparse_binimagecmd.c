@@ -140,6 +140,19 @@ int argparse_binimagecmd(int num_args, char **arg_ptr)
                 }
                 return 2;
 
+            case 'q':
+            {
+                if (num_args < 1)
+                {
+                    return 0;
+                }
+                if (binimage_set_quartz_freq(arg_ptr[0]) == 0)
+                {
+                    return 0;
+                }
+                return 2;
+            }
+
             case 'z':
                 if (num_args < 1)
                 {

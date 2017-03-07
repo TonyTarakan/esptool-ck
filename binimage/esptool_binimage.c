@@ -35,7 +35,8 @@ static bin_image b_image = {
  .magic             = 0xe9,
  .num_segments      = 0,
  .flash_mode        = FLASH_MODE_QIO,
- .flash_size_freq   = FLASH_SIZE_8m | FLASH_FREQ_40
+ .flash_size_freq   = FLASH_SIZE_8m | FLASH_FREQ_40,
+ .quartz_freq       = FLASH_QUARTZ_FREQ_26
 };
 
 static unsigned int total_size = 0;
@@ -281,10 +282,12 @@ int binimage_write_padto(uint32_t padsize, uint32_t address)
 unsigned char binimage_parse_flash_mode(const char* str);
 unsigned char binimage_parse_flash_size(const char* str);
 unsigned char binimage_parse_flash_freq(const char* str);
+unsigned char binimage_parse_quartz_freq(const char* str);
 
 const char* binimage_flash_mode_to_str(unsigned char mode);
 const char* binimage_flash_size_to_str(unsigned char size);
 const char* binimage_flash_freq_to_str(unsigned char freq);
+const char* binimage_quartz_freq_to_str(unsigned char mode);
 
 
 int binimage_set_flash_mode(const char* modestr)
@@ -338,8 +341,26 @@ int binimage_set_flash_freq(const char* freqstr)
     return 1;
 }
 
+int binimage_set_quartz_freq(const char* quartz_freq)
+{
+    unsigned char size = binimage_parse_quartz_freq(quartz_freq);
+    if (size == INVALID_VAL)
+    {
+        LOGERR("invalid quartz frequency value: %s", quartz_freq);
+        return 0;
+    }
+
+    LOGINFO("setting quartz frequency from %s to %s", 
+            binimage_quartz_freq_to_str(b_image.quartz_freq & 0xf0),
+            binimage_quartz_freq_to_str(size));
+    
+    b_image.quartz_freq = size;
+    return 1;
+}
+
 static const char* flash_mode_str[] = {"qio", "qout", "dio", "dout"};
 static const char* flash_size_str[] = {"4m", "2m", "8m", "16m", "32m", "16m-c1", "32m-c1", "32m-c2"};
+static const char* flash_quartz_str[] = {"40M", "26M"};
 
 unsigned char binimage_parse_flash_mode(const char* str)
 {
@@ -380,6 +401,19 @@ unsigned char binimage_parse_flash_freq(const char* str)
     }
 }
 
+unsigned char binimage_parse_quartz_freq(const char* str)
+{
+    const int n = sizeof(flash_quartz_str)/sizeof(const char*);
+    for (int i = 0; i < n; ++i) 
+    {
+        if (strcasecmp(str, flash_quartz_str[i]) == 0) 
+        {
+            return (unsigned char) i;
+        }
+    }
+    return INVALID_VAL;
+}
+
 const char* binimage_flash_mode_to_str(unsigned char mode)
 {
     if (mode > FLASH_MODE_DOUT)
@@ -405,6 +439,13 @@ const char* binimage_flash_freq_to_str(unsigned char freq)
         case FLASH_FREQ_80: return "80";
         default: return "";
     }
+}
+
+const char* binimage_quartz_freq_to_str(unsigned char mode)
+{
+    if (mode > FLASH_QUARTZ_FREQ_26)
+        return "";
+    return flash_quartz_str[mode];
 }
 
 int binimage_set_header_layout(const char* layout)

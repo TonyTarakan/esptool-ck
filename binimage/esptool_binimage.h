@@ -58,7 +58,9 @@ typedef struct {
 
     /* High four bits: 0 = 512K, 1 = 256K, 2 = 1M, 3 = 2M, 4 = 4M, 
        Low four bits:  0 = 40MHz, 1= 26MHz, 2 = 20MHz, 0xf = 80MHz */
-    unsigned char		flash_size_freq;
+    unsigned char	flash_size_freq;
+    
+    unsigned char       quartz_freq;
 
     uint32_t            entry;
     FILE                *image_file;
@@ -84,6 +86,9 @@ typedef struct {
 #define FLASH_FREQ_26   0x1
 #define FLASH_FREQ_20   0x2
 #define FLASH_FREQ_80   0xf
+
+#define FLASH_QUARTZ_FREQ_26   1
+#define FLASH_QUARTZ_FREQ_40   0
 
 /*
 ** function prototypes
@@ -137,6 +142,7 @@ int binimage_set_flash_mode(const char* mode);
 int binimage_set_flash_size(const char* size);
 int binimage_set_flash_freq(const char* freq);
 int binimage_set_header_layout(const char* layout);
+int binimage_set_quartz_freq(const char* quartz_freq);
 
 bin_image *get_image_param(void);
 unsigned char get_flash_mode(void);
